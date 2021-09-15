@@ -5,6 +5,17 @@ import 'src/settings/settings_controller.dart';
 import 'src/settings/settings_service.dart';
 
 void main() async {
+  bool isInRelease = true;
+
+  assert(() {
+    //isInRelease = false;
+    return true;
+  }());
+
+  if (isInRelease) {
+    debugPrint = (String? message, {int? wrapWidth}) {};
+  }
+
   // Set up the SettingsController, which will glue user settings to multiple
   // Flutter Widgets.
   final settingsController = SettingsController(SettingsService());
