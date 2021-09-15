@@ -8,6 +8,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.8.1"
+  boardview:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: "feature/drag-and-drop-on-click"
+      resolved-ref: "1d85f582b52d874a1204618ef3967e08b94651b9"
+      url: "git://github.com/ianmaciel/FlutterBoardView.git"
+    source: git
+    version: "0.2.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -168,5 +177,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  vs_scrollbar:
+    dependency: transitive
+    description:
+      name: vs_scrollbar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.1"
 sdks:
   dart: ">=2.12.0 <3.0.0"
+  flutter: ">=1.17.0"
