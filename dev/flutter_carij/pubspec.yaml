@@ -20,6 +20,12 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  provider: ^6.0.0
+  gitlab:
+    path: ../../../gitlab-dart
+    # git:
+    #   url: git://github.com/ianmaciel/FlutterBoardView.git
+    #   ref: feature/drag-and-drop-on-click
 
 dev_dependencies:
   flutter_test:

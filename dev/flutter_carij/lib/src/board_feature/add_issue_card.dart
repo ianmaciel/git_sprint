@@ -22,47 +22,19 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:gitlab/gitlab.dart' as glab;
 import 'package:boardview/board_item.dart';
 
-import 'issue_type_model.dart';
-
-class IssueModel {
-  late int id;
-  late String title;
-  late IssueTypeModel type;
-  late String description;
-  glab.Issue? gitlabIssue;
-  IssueModel({
-    required this.id,
-    required this.title,
-    required this.type,
-    this.description = '',
-  });
-
-  IssueModel.fromGitlabIssue(this.gitlabIssue) {
-    id = gitlabIssue!.id!;
-    title = gitlabIssue!.title!;
-    type = IssueTypeModel.task;
-    description = gitlabIssue!.description ?? '';
-  }
-
-  BoardItem buildBoardItem() {
+class AddIssueCard {
+  static BoardItem buildBoardItem({ValueChanged<String>? onFieldSubmitted}) {
     return BoardItem(
-      item: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(title),
-        ),
+      draggable: false,
+      item: Column(
+        children: [
+          TextFormField(
+            onFieldSubmitted: onFieldSubmitted,
+          )
+        ],
       ),
     );
   }
-
-  static List<BoardItem> buildBoardList(List<IssueModel> issues) =>
-      issues.map((IssueModel issue) => issue.buildBoardItem()).toList();
-
-  static List<IssueModel> buildIssuesListFromGitlab(List<glab.Issue> issues) =>
-      issues
-          .map((glab.Issue issue) => IssueModel.fromGitlabIssue(issue))
-          .toList();
 }
