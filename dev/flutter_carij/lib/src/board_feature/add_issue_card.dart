@@ -28,12 +28,17 @@ class AddIssueCard {
   static BoardItem buildBoardItem({ValueChanged<String>? onFieldSubmitted}) {
     return BoardItem(
       draggable: false,
-      item: Column(
-        children: [
-          TextFormField(
-            onFieldSubmitted: onFieldSubmitted,
-          )
-        ],
+      item: Card(
+        child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                TextFormField(
+                  onFieldSubmitted: onFieldSubmitted,
+                  decoration: const InputDecoration(labelText: 'New issue:'),
+                ),
+              ],
+            )),
       ),
     );
   }
