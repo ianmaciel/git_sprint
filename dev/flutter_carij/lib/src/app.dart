@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       animation: settingsController,
       builder: (BuildContext context, Widget? child) {
         return ChangeNotifierProvider<GitlabProvider>(
-          create: (_) => GitlabProvider(),
+          create: (_) => GitlabProvider(settingsController),
           child: MaterialApp(
             // Providing a restorationScopeId allows the Navigator built by the
             // MaterialApp to restore the navigation stack when a user leaves and

@@ -14,18 +14,24 @@ class SettingsController with ChangeNotifier {
   // Make SettingsService a private variable so it is not used directly.
   final SettingsService _settingsService;
 
-  // Make ThemeMode a private variable so it is not updated directly without
+  // Make prerences a private variable so it is not updated directly without
   // also persisting the changes with the SettingsService.
   late ThemeMode _themeMode;
+  late String _gitlabToken;
+  // TODO this should not be hardcoded.
+  int _gitlabProjectId = 29647408;
 
-  // Allow Widgets to read the user's preferred ThemeMode.
+  // Allow Widgets to read the user's preferences.
   ThemeMode get themeMode => _themeMode;
+  String get gitlabToken => _gitlabToken;
+  int get gitlabProjectId => _gitlabProjectId;
 
   /// Load the user's settings from the SettingsService. It may load from a
   /// local database or the internet. The controller only knows it can load the
   /// settings from the service.
   Future<void> loadSettings() async {
     _themeMode = await _settingsService.themeMode();
+    _gitlabToken = await _settingsService.gitlabToken();
 
     // Important! Inform listeners a change has occurred.
     notifyListeners();
@@ -47,5 +53,37 @@ class SettingsController with ChangeNotifier {
     // Persist the changes to a local database or the internet using the
     // SettingService.
     await _settingsService.updateThemeMode(newThemeMode);
+  }
+
+  /// Update and persist the gitlab access token.
+  Future<void> updateGitlabToken(String newToken) async {
+    // Dot not perform any work if new and old token are identical
+    if (newToken == _gitlabToken) return;
+
+    // Otherwise, store the new token mode in memory
+    _gitlabToken = newToken;
+
+    // Important! Inform listeners a change has occurred.
+    notifyListeners();
+
+    // Persist the changes to a local database or the internet using the
+    // SettingService.
+    await _settingsService.updateGitlabToken(newToken);
+  }
+
+  /// Update and persist the gitlab project id.
+  Future<void> updateGitlabProjectId(int? newProjectId) async {
+    if (newProjectId == null) {
+      return;
+    }
+
+    // Dot not perform any work if new and old token are identical
+    if (newProjectId == _gitlabProjectId) return;
+
+    // Otherwise, store the new token mode in memory
+    _gitlabProjectId = newProjectId;
+
+    // Important! Inform listeners a change has occurred.
+    notifyListeners();
   }
 }

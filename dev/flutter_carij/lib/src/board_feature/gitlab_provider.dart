@@ -21,39 +21,39 @@
 // SOFTWARE.
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_carij/src/settings/settings_controller.dart';
 
 import 'package:gitlab/gitlab.dart';
 
 class GitlabProvider extends ChangeNotifier {
+  final SettingsController _settingsController;
   late GitLab gitLab;
   late ProjectsApi gitLabProject;
   List<Issue>? issues;
-  String? token;
-  int? projectId;
-  // TODO: remove default project id
-  GitlabProvider() {
-    projectId = 29647408;
+  String get token => _settingsController.gitlabToken;
+  int get projectId => _settingsController.gitlabProjectId;
+  GitlabProvider(this._settingsController) {
+    init();
   }
 
-  void setProjetId(String projectId) =>
-      this.projectId = int.tryParse(projectId);
-  void setToken(String token) => token = token;
+  void setProjetId(String newProjectId) =>
+      _settingsController.updateGitlabProjectId(int.tryParse(newProjectId));
+  void setToken(String newToken) =>
+      _settingsController.updateGitlabToken(newToken);
 
-  void init({String? token, int? projectId}) {
+  void init({String? token, String? projectId}) {
     if (token != null) {
-      this.token = token;
+      setToken(token);
     }
     if (projectId != null) {
-      this.projectId = projectId;
+      setProjetId(projectId);
     }
 
-    if (this.token != null && this.projectId != null) {
-      gitLab = GitLab(this.token!);
-      gitLabProject = gitLab.project(this.projectId!);
+    if (this.token.isNotEmpty) {
+      gitLab = GitLab(this.token);
+      gitLabProject = gitLab.project(this.projectId);
       getIssues();
     }
-    // gitLab = GitLab('');
-    // gitLabProject = gitLab.project(29647408);
   }
 
   void getIssues() {
