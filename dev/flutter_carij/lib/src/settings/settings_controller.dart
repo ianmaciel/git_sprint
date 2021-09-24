@@ -18,13 +18,12 @@ class SettingsController with ChangeNotifier {
   // also persisting the changes with the SettingsService.
   late ThemeMode _themeMode;
   late String _gitlabToken;
-  // TODO this should not be hardcoded.
-  int _gitlabProjectId = 29647408;
+  int? _gitlabProjectId;
 
   // Allow Widgets to read the user's preferences.
   ThemeMode get themeMode => _themeMode;
   String get gitlabToken => _gitlabToken;
-  int get gitlabProjectId => _gitlabProjectId;
+  int? get gitlabProjectId => _gitlabProjectId;
 
   /// Load the user's settings from the SettingsService. It may load from a
   /// local database or the internet. The controller only knows it can load the
@@ -32,6 +31,7 @@ class SettingsController with ChangeNotifier {
   Future<void> loadSettings() async {
     _themeMode = await _settingsService.themeMode();
     _gitlabToken = await _settingsService.gitlabToken();
+    _gitlabProjectId = await _settingsService.gitlabProjectId();
 
     // Important! Inform listeners a change has occurred.
     notifyListeners();
@@ -85,5 +85,9 @@ class SettingsController with ChangeNotifier {
 
     // Important! Inform listeners a change has occurred.
     notifyListeners();
+
+    // Persist the changes to a local database or the internet using the
+    // SettingService.
+    await _settingsService.updateGitlabProjectId(newProjectId);
   }
 }

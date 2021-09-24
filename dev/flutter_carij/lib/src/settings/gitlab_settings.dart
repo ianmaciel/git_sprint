@@ -30,15 +30,12 @@ class GitlabSettings extends StatelessWidget {
   GitlabSettings({Key? key}) : super(key: key);
 
   final TextEditingController controllerToken = TextEditingController(text: '');
-  final TextEditingController controllerProjectId =
-      TextEditingController(text: '');
 
   @override
   Widget build(BuildContext context) {
     return Consumer<GitlabController>(builder:
         (BuildContext context, GitlabController gitlabProvider, Widget? child) {
       controllerToken.text = gitlabProvider.token;
-      controllerProjectId.text = gitlabProvider.projectId.toString();
       return Column(
         children: [
           Card(
@@ -51,15 +48,6 @@ class GitlabSettings extends StatelessWidget {
                     onChanged: gitlabProvider.setToken,
                     controller: controllerToken,
                   ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  const Text('Project ID'),
-                  TextFormField(
-                    keyboardType: TextInputType.number,
-                    onChanged: gitlabProvider.setProjetId,
-                    controller: controllerProjectId,
-                  ),
                 ],
               ),
             ),
@@ -69,9 +57,7 @@ class GitlabSettings extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              gitlabProvider.init(
-                  projectId: controllerProjectId.text,
-                  token: controllerToken.text);
+              gitlabProvider.init(token: controllerToken.text);
               Navigator.of(context).pop();
             },
             child: const Text('OK'),

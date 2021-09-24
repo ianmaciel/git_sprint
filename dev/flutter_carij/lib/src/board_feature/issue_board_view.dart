@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:boardview/board_item.dart';
 import 'package:boardview/board_view.dart';
@@ -69,7 +70,7 @@ class IssueBoardView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Issues Board'),
+        title: Text(AppLocalizations.of(context)!.issuesBoard),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -93,16 +94,20 @@ class IssueBoardView extends StatelessWidget {
 
             _boardColumns.first.items.insert(
                 0,
-                AddIssueCard.buildBoardItem(
+                AddIssueCard.buildBoardItem(context,
                     onFieldSubmitted: (String text) =>
                         gitlabController.createIssue(text)));
           }
 
           return Column(
             children: [
-              BoardView(
-                lists: BoardColumnModel.buildBoardList(_boardColumns),
-                boardViewController: BoardViewController(),
+              ProjectSelector(gitlabController),
+              Flexible(
+                flex: 1,
+                child: BoardView(
+                  lists: BoardColumnModel.buildBoardList(_boardColumns),
+                  boardViewController: BoardViewController(),
+                ),
               ),
             ],
           );

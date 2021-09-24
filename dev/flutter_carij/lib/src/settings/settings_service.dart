@@ -47,4 +47,16 @@ class SettingsService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('gitlabToken', token);
   }
+
+  /// Loads the gitlab projectId.
+  Future<int?> gitlabProjectId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('gitlabProjectId');
+  }
+
+  /// Persists the gitlab user's token.
+  Future<void> updateGitlabProjectId(int projectId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('gitlabProjectId', projectId);
+  }
 }

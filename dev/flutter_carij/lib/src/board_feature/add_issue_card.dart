@@ -21,11 +21,13 @@
 // SOFTWARE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:boardview/board_item.dart';
 
 class AddIssueCard {
-  static BoardItem buildBoardItem({ValueChanged<String>? onFieldSubmitted}) {
+  static BoardItem buildBoardItem(BuildContext context,
+      {ValueChanged<String>? onFieldSubmitted}) {
     return BoardItem(
       draggable: false,
       item: Card(
@@ -35,7 +37,8 @@ class AddIssueCard {
               children: [
                 TextFormField(
                   onFieldSubmitted: onFieldSubmitted,
-                  decoration: const InputDecoration(labelText: 'New issue:'),
+                  decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.newIssue),
                 ),
               ],
             )),

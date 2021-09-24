@@ -27,11 +27,12 @@ import 'package:gitlab/gitlab.dart';
 
 class GitlabController extends ChangeNotifier {
   final SettingsController _settingsController;
-  late GitLab gitLab;
-  late ProjectsApi gitLabProject;
+  GitLab? gitlab;
+  late ProjectsApi gitlabProject;
+  List<Project> projects = <Project>[];
   List<Issue>? issues;
   String get token => _settingsController.gitlabToken;
-  int get projectId => _settingsController.gitlabProjectId;
+  int? get projectId => _settingsController.gitlabProjectId;
   GitlabController(this._settingsController) {
     init();
   }
@@ -41,7 +42,7 @@ class GitlabController extends ChangeNotifier {
   void setToken(String newToken) =>
       _settingsController.updateGitlabToken(newToken);
 
-  void init({String? token, String? projectId}) {
+  void init({String? token, String? projectId}) async {
     if (token != null) {
       setToken(token);
     }
@@ -50,35 +51,60 @@ class GitlabController extends ChangeNotifier {
     }
 
     if (this.token.isNotEmpty) {
-      gitLab = GitLab(this.token);
-      gitLabProject = gitLab.project(this.projectId);
-      getIssues();
+      gitlab = GitLab(this.token);
+      gitlabProject = gitlab!.project(this.projectId);
+      await loadUserProjects();
+    }
+
+    if (gitlab != null && this.projectId != null) {
+      if (gitlabProject.id != null) {
+        await loadIssues();
+      }
     }
   }
 
-  void getIssues() {
-    gitLabProject.issues.list(page: 0, perPage: 30).then(updateIssues);
-  }
-
-  void updateIssues(List<Issue> issues) {
-    this.issues = issues;
-    // TODO: mocked, remove this.
-    loadIssue(issues.first.iid!);
+  Future<void> loadIssues() async {
+    issues = await gitlabProject.issues.list(page: 0, perPage: 30);
     notifyListeners();
   }
 
-  void loadIssue(int id) {
-    gitLabProject.issues.get(id).then(onIssueLoaded);
-  }
-
-  void onIssueLoaded(Issue issue) {
-    // TODO
-    Issue newIssue = issue;
+  Future<void> loadUserProjects() async {
+    projects = await gitlabProject.list(
+      archived: false,
+      minAccessLevel: ProjectMinAccessLevel.guest,
+      page: 0,
+      perPage: 30,
+    );
+    notifyListeners();
   }
 
   void createIssue(String title) async {
-    Issue created = await gitLabProject.issues.add(title);
+    Issue created = await gitlabProject.issues.add(title);
     issues!.add(created);
     notifyListeners();
+  }
+
+  void onChangeSelectedProject(Project? project) {
+    if (project != null) {
+      gitlabProject.id = project.id;
+      _settingsController.updateGitlabProjectId(project.id);
+      loadIssues();
+    }
+  }
+
+  /// Get the selected project.
+  Project? getProject() {
+    if (projects.isNotEmpty) {
+      if (projectId != null) {
+        return projects.where((project) => project.id == projectId).first;
+      }
+    }
+  }
+
+  /// Get the selected project or the first one.
+  Project? getFirstProject() {
+    if (projects.isNotEmpty) {
+      return getProject() ?? projects.first;
+    }
   }
 }
