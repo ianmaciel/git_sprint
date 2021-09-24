@@ -25,14 +25,14 @@ import 'package:flutter_carij/src/settings/settings_controller.dart';
 
 import 'package:gitlab/gitlab.dart';
 
-class GitlabProvider extends ChangeNotifier {
+class GitlabController extends ChangeNotifier {
   final SettingsController _settingsController;
   late GitLab gitLab;
   late ProjectsApi gitLabProject;
   List<Issue>? issues;
   String get token => _settingsController.gitlabToken;
   int get projectId => _settingsController.gitlabProjectId;
-  GitlabProvider(this._settingsController) {
+  GitlabController(this._settingsController) {
     init();
   }
 

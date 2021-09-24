@@ -29,7 +29,8 @@ import 'package:provider/provider.dart';
 
 import 'add_issue_card.dart';
 import 'board_column_model.dart';
-import 'gitlab_provider.dart';
+import 'gitlab_controller.dart';
+import 'project_selector.dart';
 import 'issue_model.dart';
 import '../settings/settings_view.dart';
 
@@ -81,25 +82,29 @@ class IssueBoardView extends StatelessWidget {
           ),
         ],
       ),
-      body: Consumer<GitlabProvider>(
-        builder: (BuildContext context, GitlabProvider gitlabProvider,
+      body: Consumer<GitlabController>(
+        builder: (BuildContext context, GitlabController gitlabController,
             Widget? child) {
-          if (gitlabProvider.issues != null) {
+          if (gitlabController.issues != null) {
             // TODO: this shouldn't be hardcoded
             _boardColumns[0] = BoardColumnModel.fromGitlabIssues(
-                gitlabProvider.issues!,
+                gitlabController.issues!,
                 title: 'TODO');
 
             _boardColumns.first.items.insert(
                 0,
                 AddIssueCard.buildBoardItem(
                     onFieldSubmitted: (String text) =>
-                        gitlabProvider.createIssue(text)));
+                        gitlabController.createIssue(text)));
           }
 
-          return BoardView(
-            lists: BoardColumnModel.buildBoardList(_boardColumns),
-            boardViewController: BoardViewController(),
+          return Column(
+            children: [
+              BoardView(
+                lists: BoardColumnModel.buildBoardList(_boardColumns),
+                boardViewController: BoardViewController(),
+              ),
+            ],
           );
         },
       ),

@@ -24,7 +24,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
-import '../board_feature/gitlab_provider.dart';
+import '../board_feature/gitlab_controller.dart';
 
 class GitlabSettings extends StatelessWidget {
   GitlabSettings({Key? key}) : super(key: key);
@@ -35,8 +35,8 @@ class GitlabSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GitlabProvider>(builder:
-        (BuildContext context, GitlabProvider gitlabProvider, Widget? child) {
+    return Consumer<GitlabController>(builder:
+        (BuildContext context, GitlabController gitlabProvider, Widget? child) {
       controllerToken.text = gitlabProvider.token;
       controllerProjectId.text = gitlabProvider.projectId.toString();
       return Column(

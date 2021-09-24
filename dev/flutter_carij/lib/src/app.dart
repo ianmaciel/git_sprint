@@ -4,7 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:provider/provider.dart';
 
-import 'board_feature/gitlab_provider.dart';
+import 'board_feature/gitlab_controller.dart';
 import 'board_feature/issue_board_view.dart';
 import 'sample_feature/sample_item_details_view.dart';
 import 'sample_feature/sample_item_list_view.dart';
@@ -29,8 +29,8 @@ class MyApp extends StatelessWidget {
     return AnimatedBuilder(
       animation: settingsController,
       builder: (BuildContext context, Widget? child) {
-        return ChangeNotifierProvider<GitlabProvider>(
-          create: (_) => GitlabProvider(settingsController),
+        return ChangeNotifierProvider<GitlabController>(
+          create: (_) => GitlabController(settingsController),
           child: MaterialApp(
             // Providing a restorationScopeId allows the Navigator built by the
             // MaterialApp to restore the navigation stack when a user leaves and
