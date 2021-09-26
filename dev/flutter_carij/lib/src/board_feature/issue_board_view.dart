@@ -21,14 +21,19 @@
 // SOFTWARE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:boardview/board_item.dart';
 import 'package:boardview/board_view.dart';
 import 'package:boardview/board_view_controller.dart';
+import 'package:provider/provider.dart';
 
+import 'add_issue_card.dart';
 import 'board_column_model.dart';
+import 'gitlab_controller.dart';
+import 'project_selector.dart';
 import 'issue_model.dart';
-import 'issue_type_model.dart';
+import '../settings/settings_view.dart';
 
 /// Displays the issue board.
 ///
@@ -39,36 +44,8 @@ class IssueBoardView extends StatelessWidget {
 
   static const routeName = '/board';
 
-  static final List<IssueModel> _todoList = <IssueModel>[
-    IssueModel(
-      id: 1,
-      title: 'Add Firebase login',
-      type: IssueTypeModel.task,
-    ),
-    IssueModel(
-      id: 2,
-      title: 'Load issues from firebase',
-      type: IssueTypeModel.task,
-    ),
-    IssueModel(
-      id: 3,
-      title: 'Save issues on firebase',
-      type: IssueTypeModel.task,
-    ),
-    IssueModel(
-      id: 4,
-      title: 'Create method to add new issues',
-      type: IssueTypeModel.task,
-    ),
-    IssueModel(
-      id: 5,
-      title: 'Create a backlog screen',
-      type: IssueTypeModel.task,
-    ),
-  ];
-
   final List<BoardColumnModel> _boardColumns = [
-    BoardColumnModel(title: "TODO", issues: _todoList),
+    BoardColumnModel(title: "TODO", issues: <IssueModel>[]),
     BoardColumnModel(title: "In Progress", issues: <IssueModel>[]),
     BoardColumnModel(title: "Done", issues: <IssueModel>[])
   ];
@@ -93,11 +70,48 @@ class IssueBoardView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Issues Board'),
+        title: Text(AppLocalizations.of(context)!.issuesBoard),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              // Navigate to the settings page. If the user leaves and returns
+              // to the app after it has been killed while running in the
+              // background, the navigation stack is restored.
+              Navigator.restorablePushNamed(context, SettingsView.routeName);
+            },
+          ),
+        ],
       ),
-      body: BoardView(
-        lists: BoardColumnModel.buildBoardList(_boardColumns),
-        boardViewController: BoardViewController(),
+      body: Consumer<GitlabController>(
+        builder: (BuildContext context, GitlabController gitlabController,
+            Widget? child) {
+          if (gitlabController.issues != null) {
+            // TODO: this shouldn't be hardcoded
+            _boardColumns[0] = BoardColumnModel.fromGitlabIssues(
+                gitlabController.issues!,
+                title: 'TODO');
+
+            _boardColumns.first.items.insert(
+                0,
+                AddIssueCard.buildBoardItem(context,
+                    onFieldSubmitted: (String text) =>
+                        gitlabController.createIssue(text)));
+          }
+
+          return Column(
+            children: [
+              ProjectSelector(gitlabController),
+              Flexible(
+                flex: 1,
+                child: BoardView(
+                  lists: BoardColumnModel.buildBoardList(_boardColumns),
+                  boardViewController: BoardViewController(),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

@@ -21,48 +21,28 @@
 // SOFTWARE.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'package:gitlab/gitlab.dart' as glab;
 import 'package:boardview/board_item.dart';
 
-import 'issue_type_model.dart';
-
-class IssueModel {
-  late int id;
-  late String title;
-  late IssueTypeModel type;
-  late String description;
-  glab.Issue? gitlabIssue;
-  IssueModel({
-    required this.id,
-    required this.title,
-    required this.type,
-    this.description = '',
-  });
-
-  IssueModel.fromGitlabIssue(this.gitlabIssue) {
-    id = gitlabIssue!.id!;
-    title = gitlabIssue!.title!;
-    type = IssueTypeModel.task;
-    description = gitlabIssue!.description ?? '';
-  }
-
-  BoardItem buildBoardItem() {
+class AddIssueCard {
+  static BoardItem buildBoardItem(BuildContext context,
+      {ValueChanged<String>? onFieldSubmitted}) {
     return BoardItem(
+      draggable: false,
       item: Card(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(title),
-        ),
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                TextFormField(
+                  onFieldSubmitted: onFieldSubmitted,
+                  decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.newIssue),
+                ),
+              ],
+            )),
       ),
     );
   }
-
-  static List<BoardItem> buildBoardList(List<IssueModel> issues) =>
-      issues.map((IssueModel issue) => issue.buildBoardItem()).toList();
-
-  static List<IssueModel> buildIssuesListFromGitlab(List<glab.Issue> issues) =>
-      issues
-          .map((glab.Issue issue) => IssueModel.fromGitlabIssue(issue))
-          .toList();
 }

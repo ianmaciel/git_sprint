@@ -22,15 +22,16 @@
 
 import 'package:flutter/material.dart';
 
+import 'package:gitlab/gitlab.dart' as glab;
 import 'package:boardview/board_item.dart';
 import 'package:boardview/board_list.dart';
 
 import 'issue_model.dart';
 
 class BoardColumnModel {
-  String title;
-  List<IssueModel> issues;
-  bool draggable;
+  late String title;
+  late List<IssueModel> issues;
+  late bool draggable;
   OnDropList? onDropList;
   OnTapList? onTapList;
   OnStartDragList? onStartDragList;
@@ -45,6 +46,15 @@ class BoardColumnModel {
     this.onStartDragList,
   }) {
     items = IssueModel.buildBoardList(issues);
+  }
+
+  BoardColumnModel.fromGitlabIssues(
+    List<glab.Issue> gitlabIssueList, {
+    required this.title,
+  }) {
+    issues = IssueModel.buildIssuesListFromGitlab(gitlabIssueList);
+    items = IssueModel.buildBoardList(issues);
+    draggable = true;
   }
 
   BoardList buildBoardColumn() {
