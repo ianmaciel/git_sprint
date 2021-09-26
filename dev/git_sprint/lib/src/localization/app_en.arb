@@ -1,0 +1,26 @@
+{
+  "appTitle": "Git Sprint",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "issuesBoard": "Issues Board",
+  "@issuesBoard": {
+    "description": "Issues board title"
+  },
+  "newIssue": "New issue:",
+  "@newIssue": {
+    "description": "Description that appears on new issue card"
+  },
+  "noProjectAvailable": "Not available",
+  "@noProjectAvailable": {
+    "description": "Hint on projects dropdown when no project is available (disabled hint)"
+  },
+  "projects": "Projects",
+  "@projects": {
+    "description": "Title that appears before the projects dropdown selector"
+  },
+  "selectProject": "Select a project",
+  "@selectProject": {
+    "description": "Hint on projects dropdown when no project is selected"
+  }
+}

@@ -1,0 +1,51 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.187.0/containers/ubuntu
+{
+  "name": "Ubuntu",
+
+  "build": {
+    "dockerfile": "Dockerfile",
+    // Update 'VARIANT' to pick an Ubuntu version: focal, bionic
+    "args": {
+      "VARIANT": "focal"
+    }
+  },
+
+  // Set *default* container specific settings.json values on container create.
+  "settings": {},
+
+  // Add the IDs of extensions you want installed when the container is created.
+  "extensions": [
+    "streetsidesoftware.code-spell-checker",
+    "ms-azuretools.vscode-docker",
+    "shardulm94.trailing-spaces",
+    "dart-code.flutter",
+    "eamodio.gitlens",
+  ],
+
+  "runArgs": [
+    // [Linux only] Share X11 tmp so docker can access host display.
+    "-v",
+    "/tmp/.X11-unix:/tmp/.X11-unix"
+    //"-v",
+    //"/dev/usb:/dev/usb"
+  ],
+
+  "remoteEnv": {
+    // https://github.com/microsoft/vscode-remote-release/issues/3841
+    // Use "DISPLAY": "host.docker.internal:0" for windows/mac
+    //"DISPLAY": "host.docker.internal:0",
+    // Use for "DISPLAY": "${env:DISPLAY}" Linux
+    "DISPLAY": "${env:DISPLAY}",
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [],
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // Enable Flutter desktop support
+  //"postCreateCommand": "flutter config --enable-linux-desktop && flutter config --enable-windows-desktop && flutter config --enable-macos-desktop && flutter devices && flutter pub get",
+
+  // Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+  "remoteUser": "vscode"
+}
