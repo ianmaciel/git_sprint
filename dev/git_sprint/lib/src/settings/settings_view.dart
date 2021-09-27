@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gitsprint/src/settings/gitlab_settings.dart';
+import 'package:provider/provider.dart';
 
+import 'gitlab_settings_form.dart';
 import 'settings_controller.dart';
 
 /// Displays the various settings that can be customized by the user.
@@ -8,11 +10,9 @@ import 'settings_controller.dart';
 /// When a user changes a setting, the SettingsController is updated and
 /// Widgets that listen to the SettingsController are rebuilt.
 class SettingsView extends StatelessWidget {
-  const SettingsView({Key? key, required this.controller}) : super(key: key);
+  const SettingsView({Key? key}) : super(key: key);
 
   static const routeName = '/settings';
-
-  final SettingsController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -26,31 +26,39 @@ class SettingsView extends StatelessWidget {
         //
         // When a user selects a theme from the dropdown list, the
         // SettingsController is updated, which rebuilds the MaterialApp.
-        child: Column(
-          children: [
-            GitlabSettings(),
-            DropdownButton<ThemeMode>(
-              // Read the selected themeMode from the controller
-              value: controller.themeMode,
-              // Call the updateThemeMode method any time the user selects a theme.
-              onChanged: controller.updateThemeMode,
-              items: const [
-                DropdownMenuItem(
-                  value: ThemeMode.system,
-                  child: Text('System Theme'),
-                ),
-                DropdownMenuItem(
-                  value: ThemeMode.light,
-                  child: Text('Light Theme'),
-                ),
-                DropdownMenuItem(
-                  value: ThemeMode.dark,
-                  child: Text('Dark Theme'),
-                )
-              ],
-            ),
-          ],
-        ),
+        child: Consumer<SettingsController>(builder: (BuildContext context,
+            SettingsController controller, Widget? child) {
+          return Column(
+            children: [
+              GitlabSettingsForm(controller),
+              DropdownButton<ThemeMode>(
+                // Read the selected themeMode from the controller
+                value: controller.themeMode,
+                // Call the updateThemeMode method any time the user selects a theme.
+                onChanged: controller.updateThemeMode,
+                items: const [
+                  DropdownMenuItem(
+                    value: ThemeMode.system,
+                    child: Text('System Theme'),
+                  ),
+                  DropdownMenuItem(
+                    value: ThemeMode.light,
+                    child: Text('Light Theme'),
+                  ),
+                  DropdownMenuItem(
+                    value: ThemeMode.dark,
+                    child: Text('Dark Theme'),
+                  )
+                ],
+              ),
+              ElevatedButton(
+                onPressed: controller.applySettings,
+                // TODO translate text
+                child: const Text('Apply Settings'),
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

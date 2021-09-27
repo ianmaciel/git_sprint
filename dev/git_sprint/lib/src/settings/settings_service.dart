@@ -30,33 +30,51 @@ class SettingsService {
     await prefs.setInt('userTheme', theme.index);
   }
 
-  /// Loads the gitlab user's token.
-  ///
-  /// TODO double check if the token can be saved on shared-preferences.
-  /// It might be necessary to use flutter_secure_storage instead.
-  Future<String> gitlabToken() async {
+  /// Loads the oauth callback port used by apps (not web).
+  Future<int?> oauthCallbackPort() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('gitlabToken') ?? '';
+    return prefs.getInt('oauthCallbackPort');
   }
 
-  /// Persists the gitlab user's token.
-  ///
-  /// TODO double check if the token can be saved on shared-preferences.
-  /// It might be necessary to use flutter_secure_storage instead.
-  Future<void> updateGitlabToken(String token) async {
+  /// Persists the oauth callback port used by apps (not web).
+  Future<void> updateOAuthCallbackPort(int oauthCallbackPort) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('gitlabToken', token);
+    await prefs.setInt('oauthCallbackPort', oauthCallbackPort);
   }
 
-  /// Loads the gitlab projectId.
-  Future<int?> gitlabProjectId() async {
+  /// Loads the oauth server domain.
+  Future<String?> oauthServerDomain() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getInt('gitlabProjectId');
+    return prefs.getString('oauthServerDomain');
   }
 
-  /// Persists the gitlab user's token.
-  Future<void> updateGitlabProjectId(int projectId) async {
+  /// Persists the oauth server domain.
+  Future<void> updateOAuthServerDomain(String domain) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('gitlabProjectId', projectId);
+    await prefs.setString('oauthServerDomain', domain);
+  }
+
+  /// Loads the oauth server domain.
+  Future<String?> oauthServerClientId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('oauthClientId');
+  }
+
+  /// Persists the oauth server domain.
+  Future<void> updateOAuthClientId(String clientId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('oauthClientId', clientId);
+  }
+
+  /// Loads the oauth server domain.
+  Future<String?> oauthServerClientSecret() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('oauthClientSecret');
+  }
+
+  /// Persists the oauth server domain.
+  Future<void> updateOAuthClientSecret(String clientSecret) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('oauthClientSecret', clientSecret);
   }
 }
