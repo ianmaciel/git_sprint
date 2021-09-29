@@ -1,6 +1,9 @@
-# gitsprint
+# Git Sprint
 
-A new Flutter project.
+Git Sprint is an open source sprint planner project. It helps to organize scrum projects.
+
+This is a work in progress.
+Currently only gitlab is supported.
 
 ## Getting Started
 

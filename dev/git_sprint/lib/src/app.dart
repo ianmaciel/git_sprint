@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:gitsprint/src/login/login_controller.dart';
 
 import 'package:provider/provider.dart';
 
 import 'board_feature/gitlab_controller.dart';
 import 'board_feature/issue_board_view.dart';
+import 'login/login_view.dart';
+import 'login/redirected_after_login_view.dart';
 import 'sample_feature/sample_item_details_view.dart';
 import 'sample_feature/sample_item_list_view.dart';
 import 'settings/settings_controller.dart';
@@ -13,12 +16,15 @@ import 'settings/settings_view.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
-  const MyApp({
+  MyApp({
     Key? key,
     required this.settingsController,
-  }) : super(key: key);
+  }) : super(key: key) {
+    _loginController = LoginController(settingsController);
+  }
 
   final SettingsController settingsController;
+  late final LoginController _loginController;
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +35,24 @@ class MyApp extends StatelessWidget {
     return AnimatedBuilder(
       animation: settingsController,
       builder: (BuildContext context, Widget? child) {
-        return ChangeNotifierProvider<GitlabController>(
-          create: (_) => GitlabController(settingsController),
+        return MultiProvider(
+          providers: <ChangeNotifierProvider<dynamic>>[
+            ChangeNotifierProvider<SettingsController>.value(
+                value: settingsController),
+            ChangeNotifierProvider<GitlabController>(
+              create: (_) =>
+                  GitlabController(_loginController, settingsController),
+              lazy: true,
+            ),
+            ChangeNotifierProvider<LoginController>.value(
+                value: _loginController),
+          ],
           child: MaterialApp(
             // Providing a restorationScopeId allows the Navigator built by the
             // MaterialApp to restore the navigation stack when a user leaves and
             // returns to the app after it has been killed while running in the
             // background.
-            restorationScopeId: 'gitsprint',
+            //restorationScopeId: 'gitsprint',
 
             // Provide the generated AppLocalizations to the MaterialApp. This
             // allows descendant Widgets to display the correct translations
@@ -67,22 +83,38 @@ class MyApp extends StatelessWidget {
             darkTheme: ThemeData.dark(),
             themeMode: settingsController.themeMode,
 
+            initialRoute: LoginView.routeName,
+
             // Define a function to handle named routes in order to support
             // Flutter web url navigation and deep linking.
             onGenerateRoute: (RouteSettings routeSettings) {
+              if (routeSettings.name == '/') {
+                return null;
+              }
+
               return MaterialPageRoute<void>(
                 settings: routeSettings,
                 builder: (BuildContext context) {
                   switch (routeSettings.name) {
-                    case SettingsView.routeName:
-                      return SettingsView(controller: settingsController);
+                    case IssueBoardView.routeName:
+                      return IssueBoardView();
+                    case LoginView.routeName:
+                      return const LoginView();
+                    case RedirectedAfterLoginView.routeName:
                     case SampleItemDetailsView.routeName:
                       return const SampleItemDetailsView();
                     case SampleItemListView.routeName:
-                    case IssueBoardView.routeName:
-                      return IssueBoardView();
+                      return const SampleItemListView();
+                    case SettingsView.routeName:
+                      return const SettingsView();
                     default:
-                      return IssueBoardView();
+                      if (routeSettings.name != null &&
+                          routeSettings.name!
+                              .startsWith(RedirectedAfterLoginView.routeName)) {
+                        return RedirectedAfterLoginView(routeSettings.name!);
+                      } else {
+                        return const LoginView();
+                      }
                   }
                 },
               );

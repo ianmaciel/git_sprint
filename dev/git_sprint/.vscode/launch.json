@@ -7,7 +7,10 @@
         {
             "name": "gitsprint",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": [
+                "--web-port=27549",
+            ]
         },
         {
             "name": "gitsprint (profile mode)",

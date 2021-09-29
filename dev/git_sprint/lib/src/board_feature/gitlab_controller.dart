@@ -1,6 +1,6 @@
 // MIT License
 
-// Copyright (c) 2021 Anonymized Developer
+// Copyright (c) 2021 Ian Koerich Maciel
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,46 +21,75 @@
 // SOFTWARE.
 
 import 'package:flutter/foundation.dart';
-import 'package:gitsprint/src/settings/settings_controller.dart';
 
 import 'package:gitlab/gitlab.dart';
+import 'package:gitsprint/src/settings/settings_controller.dart';
+
+import 'gitlab_service.dart';
+import '../login/login_controller.dart';
+import '../login/oauth_model.dart';
 
 class GitlabController extends ChangeNotifier {
+  final LoginController _loginController;
   final SettingsController _settingsController;
+  SettingsController get settingsController => _settingsController;
+  final GitlabService _gitlabService = GitlabService();
+  GitlabController(this._loginController, this._settingsController) {
+    init();
+  }
+
+  int? _projectId;
+  int? get projectId => _projectId;
+  OAuthModel get oauth => _loginController.oauth;
   GitLab? gitlab;
   late ProjectsApi gitlabProject;
   List<Project> projects = <Project>[];
   List<Issue>? issues;
-  String get token => _settingsController.gitlabToken;
-  int? get projectId => _settingsController.gitlabProjectId;
-  GitlabController(this._settingsController) {
-    init();
-  }
+  String get serverDomain => _settingsController.oauthServerDomain;
+  String get clientId => _settingsController.oauthClientId;
+  String get clientSecret => _settingsController.oauthClientSecret;
 
-  void setProjetId(String newProjectId) =>
-      _settingsController.updateGitlabProjectId(int.tryParse(newProjectId));
-  void setToken(String newToken) =>
-      _settingsController.updateGitlabToken(newToken);
-
-  void init({String? token, String? projectId}) async {
-    if (token != null) {
-      setToken(token);
+  /// Load the gitlab data from local storage.
+  Future<void> init() async {
+    if (!_loginController.initialized) {
+      await _loginController.init();
     }
-    if (projectId != null) {
-      setProjetId(projectId);
-    }
+    _projectId = await _gitlabService.projectId();
 
-    if (this.token.isNotEmpty) {
-      gitlab = GitLab(this.token);
-      gitlabProject = gitlab!.project(this.projectId);
+    if (oauth.hasValidAccessToken) {
+      gitlab = GitLab(oauth.bearerToken, tokenHeaderKey: 'Authorization');
+      gitlabProject = gitlab!.project(projectId);
       await loadUserProjects();
     }
 
-    if (gitlab != null && this.projectId != null) {
+    if (gitlab != null && projectId != null) {
       if (gitlabProject.id != null) {
         await loadIssues();
       }
     }
+
+    // Inform listeners a change has occurred.
+    notifyListeners();
+  }
+
+  /// Update and persist the gitlab project id.
+  Future<void> updateProjectId(int? newProjectId) async {
+    if (newProjectId == null) {
+      return;
+    }
+
+    // Dot not perform any work if new and old project id are identical
+    if (newProjectId == _projectId) return;
+
+    // Otherwise, store the new project id in memory
+    _projectId = newProjectId;
+
+    // Inform listeners a change has occurred.
+    notifyListeners();
+
+    // Persist the changes to a local database or the internet using the
+    // SettingService.
+    await _gitlabService.updateProjectId(newProjectId);
   }
 
   Future<void> loadIssues() async {
@@ -87,7 +116,7 @@ class GitlabController extends ChangeNotifier {
   void onChangeSelectedProject(Project? project) {
     if (project != null) {
       gitlabProject.id = project.id;
-      _settingsController.updateGitlabProjectId(project.id);
+      updateProjectId(project.id);
       loadIssues();
     }
   }

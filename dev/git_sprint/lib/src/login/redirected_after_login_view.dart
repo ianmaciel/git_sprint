@@ -1,6 +1,6 @@
 // MIT License
 
-// Copyright (c) 2021 Anonymized Developer
+// Copyright (c) 2021 Ian Koerich Maciel
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,46 +24,40 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
-import '../board_feature/gitlab_controller.dart';
+import 'login_controller.dart';
+import '../board_feature/issue_board_view.dart';
 
-class GitlabSettings extends StatelessWidget {
-  GitlabSettings({Key? key}) : super(key: key);
+class RedirectedAfterLoginView extends StatelessWidget {
+  final String _path;
+  const RedirectedAfterLoginView(this._path, {Key? key}) : super(key: key);
 
-  final TextEditingController controllerToken = TextEditingController(text: '');
+  static const routeName = '/redirected-after-login';
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<GitlabController>(builder:
-        (BuildContext context, GitlabController gitlabProvider, Widget? child) {
-      controllerToken.text = gitlabProvider.token;
-      return Column(
-        children: [
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  const Text('Gitlab Token'),
-                  TextFormField(
-                    onChanged: gitlabProvider.setToken,
-                    controller: controllerToken,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              gitlabProvider.init(token: controllerToken.text);
-              Navigator.of(context).pop();
-            },
-            child: const Text('OK'),
-          ),
-        ],
+    return Consumer<LoginController>(builder:
+        (BuildContext context, LoginController loginController, Widget? child) {
+      try {
+        if (loginController.state == LoginState.unlogged) {
+          loginController.requestAccessToken(loginController.parsePath(_path));
+        }
+        if (loginController.state == LoginState.logged) {
+          redirectToRoute(context, IssueBoardView.routeName);
+        }
+      } catch (e) {
+        // TODO: use proper feedback, tranlate, etc.
+        return Text(e.toString());
+      }
+      return const Center(
+        child: CircularProgressIndicator(
+          color: Colors.green,
+        ),
       );
     });
+  }
+
+  void redirectToRoute(BuildContext context, String route) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) =>
+        Navigator.of(context).pushNamedAndRemoveUntil(route, (_) => false));
   }
 }
